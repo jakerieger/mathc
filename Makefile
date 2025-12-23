@@ -56,4 +56,4 @@ clean:
 
 # Run
 run: $(TARGET)
-	./$(TARGET) $(TEST_DATA)/ex01.math
+	./$(TARGET)

@@ -2,12 +2,14 @@
 #include "parser.hpp"
 #include "scanner.hpp"
 
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
 #include <chrono>
+#include <string_view>
 
 using namespace mathc;
 
@@ -157,10 +159,24 @@ static i32 compile(const char* filename) {
     return 0;
 }
 
+static constexpr std::string_view help_text = R"(
+mathc - arithmetic expression compiler
+version 0.0.1-linux-x64
+
+USAGE
+  mathc <source_file>
+)";
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "error: missing input file\n";
+        std::cout << help_text << "\n";
         return -1;
+    }
+
+    if (std::strcmp(argv[1], "--help") == 0) {
+        std::cout << help_text << "\n";
+        return 0;
     }
 
     return compile(argv[1]);

@@ -116,7 +116,7 @@ namespace mathc {
             oss_ << "global main\n";
             oss_ << "extern printf\n\n";
             oss_ << "section .data\n";
-            oss_ << "    fmt: db \"Result: %.15g\", 10, 0\n\n";
+            oss_ << "    fmt: db \"%.15g\", 10, 0\n\n";
             oss_ << "section .text\n";
             oss_ << "main:\n";
             oss_ << "    push rbp\n";
