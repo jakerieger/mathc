@@ -38,7 +38,7 @@ namespace mathc {
     using std::weak_ptr;
 
     namespace fs = std::filesystem;
-    using Path   = fs::path;
+    using fs::path;
 }  // namespace mathc
 
 #define CAST static_cast

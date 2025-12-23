@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX = clang++
-CXXFLAGS = -std=c++20 -Wall -Wextra -pedantic -Wunused-variable -Wreorder-ctor
+CXXFLAGS = -std=c++20 -Wall -Wextra -pedantic -Wunused-variable
 LDFLAGS = 
 LIBS = 
 
@@ -9,7 +9,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 INC_DIR = include
-TEST_DATA = /home/jr/Code/math-compiler/test_code
+TEST_DATA = /home/jr/Code/mathc/test_code
 
 # Target executable
 TARGET = $(BIN_DIR)/mathc

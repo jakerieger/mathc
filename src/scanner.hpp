@@ -83,9 +83,7 @@ namespace mathc {
 
     class token_scanner {
     public:
-        token_scanner(string input) : source_(std::move(input)), pos_(0) {
-            std::cout << "Created scanner for source:\n" << source_ << "\n";
-        }
+        token_scanner(string input) : source_(std::move(input)), pos_(0) {}
 
         token emit();
 

@@ -14,6 +14,11 @@ namespace mathc {
             left       = std::make_unique<ast_binary_op>(std::move(left), op, std::move(right));
         }
 
+        // consume semicolon
+        if (current_.type == token_type::TOKEN_SEMICOLON) {
+            advance();
+        }
+
         return left;
     }
 

@@ -31,16 +31,21 @@ namespace mathc {
         switch (binop->op) {
             case token_type::TOKEN_ADD:
                 asm_emitter_.emit_add();
+                break;
             case token_type::TOKEN_SUBTRACT:
                 asm_emitter_.emit_sub();
+                break;
             case token_type::TOKEN_MULTIPLY:
                 asm_emitter_.emit_mul();
+                break;
             case token_type::TOKEN_DIVIDE:
                 asm_emitter_.emit_div();
+                break;
             case token_type::TOKEN_MODULO:
                 asm_emitter_.emit_mod();
+                break;
             case token_type::TOKEN_FLOOR_DIV:
-                asm_emitter_.emit_floor_div();  // ?
+                asm_emitter_.emit_floor_div();
                 break;
             default:
                 break;
