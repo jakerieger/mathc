@@ -43,9 +43,9 @@ namespace mathc {
             return node;
         }
 
-        if (match(token_type::TOKEN_L_PAREN)) {
+        if (match(token_type::TOKEN_LEFT_PAREN)) {
             auto node = parse_expression();
-            expect(token_type::TOKEN_R_PAREN);
+            expect(token_type::TOKEN_RIGHT_PAREN);
             return node;
         }
 

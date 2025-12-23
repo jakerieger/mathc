@@ -8,11 +8,17 @@ namespace mathc {
             return token(token_type::TOKEN_EOF);
         }
 
-        char c = source_.at(pos_);
+        char c = current();
 
         // skip whitespace
-        while (std::isspace(c)) {
-            c = source_.at(++pos_);
+        while (is_whitespace(c)) {
+            c = advance();
+        }
+
+        // skip comments
+        if (c == '#') {
+            skip_comment();
+            c = current();
         }
 
         auto curr_pos   = pos_;
@@ -28,8 +34,7 @@ namespace mathc {
                 type = token_type::TOKEN_MULTIPLY;
                 break;
             case '/': {
-                char next_char = source_.at(pos_ + 1);
-                if (next_char == '/') {
+                if (peek() == '/') {
                     ++pos_;
                     type = token_type::TOKEN_FLOOR_DIV;
                     break;
@@ -37,28 +42,33 @@ namespace mathc {
                 type = token_type::TOKEN_DIVIDE;
             } break;
             case '(':
-                type = token_type::TOKEN_L_PAREN;
+                type = token_type::TOKEN_LEFT_PAREN;
                 break;
             case ')':
-                type = token_type::TOKEN_R_PAREN;
+                type = token_type::TOKEN_RIGHT_PAREN;
                 break;
             case ';':
                 type = token_type::TOKEN_SEMICOLON;
                 break;
+            case '=':
+                type = token_type::TOKEN_ASSIGNMENT;
+                break;
+            case EOF:
+                type = token_type::TOKEN_EOF;
+                break;
             default:
-                if (c == EOF) {
-                    type = token_type::TOKEN_EOF;
-                    break;
-                }
-
                 if (std::isdigit(c)) {
                     return parse_number();
                 }
 
-                // Invalid token
-                std::cerr << "Invalid token '" << c << "'\n";
+                if (std::isalnum(c)) {
+                    return parse_identifier();
+                }
 
-                break;
+                std::ostringstream oss;
+                oss << "invalid token: '";
+                oss << c << "' [0x" << (i32)c << "]\n";
+                throw scan_error(oss.str());
         }
 
         ++pos_;  // increment position;
@@ -70,6 +80,26 @@ namespace mathc {
         return out;
     }
 
+    char token_scanner::current() {
+        return source_.at(pos_);
+    }
+
+    char token_scanner::advance() {
+        if (pos_ + 1 > source_.length()) {
+            throw scan_error("tried to advance past source length");
+        }
+
+        return source_.at(++pos_);
+    }
+
+    char token_scanner::peek() {
+        if (pos_ + 1 > source_.length()) {
+            throw scan_error("tried to advance past source length");
+        }
+
+        return source_.at(pos_ + 1);
+    }
+
     token token_scanner::parse_number() {
         constexpr size_t max_number_len = 64;
         auto start_pos                  = pos_;
@@ -77,15 +107,14 @@ namespace mathc {
         char buffer[max_number_len]     = {'\0'};
 
         while (pos_ < source_.size()) {
-            char c = source_.at(pos_);
+            char c = current();
 
             if (!std::isdigit(c) && c != '.') {
                 break;
             }
 
             if ((size_t)buffer_pos >= max_number_len) {
-                std::cerr << "Number value contains too many digits. The maximum supported is 64.\n";
-                return token(token_type::TOKEN_INVALID);
+                throw scan_error("number value contains too many digits (maximum is 64)");
             }
 
             buffer[buffer_pos++] = c;
@@ -99,5 +128,50 @@ namespace mathc {
         out.column = start_pos;
 
         return out;
+    }
+
+    token token_scanner::parse_identifier() {
+        // Identifiers can contain letters, numbers, and underscores
+        // They cannot begin with a number of underscore
+        // They can have a maximum length of 64 characters;
+        constexpr size_t max_ident_len = 64;
+        char buffer[max_ident_len]     = {'\0'};
+        i32 buffer_pos                 = 0;
+        auto start_pos                 = pos_;
+
+        while (pos_ < source_.size()) {
+            char c = current();
+
+            if (!std::isalnum(c) && c != '_') {
+                break;
+            }
+
+            if ((size_t)buffer_pos >= max_ident_len) {
+                throw scan_error("identifier contains too many characters (maximum is 64)");
+            }
+
+            buffer[buffer_pos++] = c;
+            ++pos_;
+        }
+
+        token out(token_type::TOKEN_IDENTIFIER, string(buffer));
+        out.line   = 1;
+        out.column = start_pos;
+
+        return out;
+    }
+
+    bool token_scanner::is_whitespace(char c) {
+        return c <= ' ';
+    }
+
+    void token_scanner::skip_comment() {
+        char c = advance();
+        while (c != '\n' && c != EOF) {
+            c = advance();
+        }
+        if (c == '\n') {
+            ++pos_;
+        }
     }
 }  // namespace mathc

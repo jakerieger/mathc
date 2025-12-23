@@ -1,0 +1,6 @@
+x = 10;
+my_var = 4324.32;
+poop = x + my_var;
+
+# this is a comment and can be safely ignored
+print(poop);

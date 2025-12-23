@@ -122,6 +122,29 @@ static i32 compile(const char* filename) {
     string input;
     i32 result = read_source_file(filename, input);
     CHECK_RESULT(result)
+#ifndef NDEBUG
+    // Check new tokens
+    {
+        token_scanner scanner(input);
+        try {
+            auto current_token = scanner.emit();
+            while (current_token.type != token_type::TOKEN_EOF) {
+                if (current_token.type == token_type::TOKEN_INVALID) {
+                    break;
+                }
+
+                std::cout << current_token;
+                current_token = scanner.emit();
+            }
+
+        } catch (const scan_error& e) {
+            std::cerr << "error: " << e.what() << "\n";
+            return 1;
+        }
+
+        return 0;
+    }
+#endif
 
     unique_ptr<ast_node> ast;
     result = get_ast(input, ast);
