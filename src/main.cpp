@@ -76,7 +76,7 @@ static i32 write_asm_to_disk(const string& assembly, const path& output_path) {
 }
 
 static i32 compile(const char* filename) {
-    std::cout << "[compiling] " << filename << "\n";
+    std::cout << "[1/1] " << filename << "\n";
 
     const auto start = std::chrono::high_resolution_clock::now();
 
@@ -117,7 +117,8 @@ static i32 compile(const char* filename) {
     const auto end     = std::chrono::high_resolution_clock::now();
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-    std::cout << "Compilation completed (took: " << elapsed << ")\n  => " << fs::absolute(exe_path).string() << "\n";
+    std::cout << "\n"
+              << "Compilation completed (took: " << elapsed << ")\n  => " << fs::absolute(exe_path).string() << "\n";
 
     return result;
 }
