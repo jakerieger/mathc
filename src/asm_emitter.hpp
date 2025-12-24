@@ -1,11 +1,12 @@
 #pragma once
 
 #include "mathc_common.hpp"
+
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 
 namespace mathc {
-
     class asm_emitter {
     public:
         asm_emitter() : var_count_(0), has_print_(false) {}
@@ -220,6 +221,16 @@ namespace mathc {
             return final_oss.str();
         }
 
+        void print_variables() const {
+            for (const auto& [name, label] : var_labels_) {
+                std::cout << " - " << name << " (" << label << ")\n";
+            }
+        }
+
+        i32 get_var_count() {
+            return var_count_;
+        }
+
     private:
         std::ostringstream code_oss_;               // Main code
         std::ostringstream bss_oss_;                // BSS section for variables
@@ -235,9 +246,9 @@ namespace mathc {
 
             converter.d = value;
 
-            std::ostringstream hex_oss;
-            hex_oss << "0x" << std::hex << std::setfill('0') << std::setw(16) << converter.u;
-            return hex_oss.str();
+            std::ostringstream oss;
+            oss << "0x" << std::hex << std::setfill('0') << std::setw(16) << converter.u;
+            return oss.str();
         }
     };
 }  // namespace mathc

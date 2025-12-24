@@ -4,3 +4,6 @@ poop = x + my_var;
 
 # this is a comment and can be safely ignored
 print(poop);
+print(x);
+print(my_var);
+print(poop + x + my_var);

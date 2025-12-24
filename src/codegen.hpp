@@ -21,6 +21,10 @@ namespace mathc {
             return asm_emitter_.get_code();
         }
 
+        [[nodiscard]] const asm_emitter& get_emitter() const {
+            return asm_emitter_;
+        }
+
     private:
         asm_emitter asm_emitter_;
 

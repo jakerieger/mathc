@@ -1,2 +1,3 @@
 Makefile linguist-vendored
 test_code/* linguist-vendored
+*.h linguist-language=C++
