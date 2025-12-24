@@ -1,4 +1,5 @@
 #include "scanner.hpp"
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 
@@ -154,7 +155,9 @@ namespace mathc {
             ++pos_;
         }
 
-        token out(token_type::TOKEN_IDENTIFIER, string(buffer));
+        string identifier = string(buffer);
+        token_type type   = is_keyword(identifier) ? token_type::TOKEN_KEYWORD : token_type::TOKEN_IDENTIFIER;
+        token out(type, identifier);
         out.line   = 1;
         out.column = start_pos;
 
@@ -173,5 +176,17 @@ namespace mathc {
         if (c == '\n') {
             ++pos_;
         }
+    }
+
+    bool token_scanner::is_keyword(const string& identifier) {
+        // For now I'm just defining keywords here.
+        // As this grows more complex, I'll need to refactor this
+        // but it'll work for now
+
+        const array<string, 1> keywords = {"print"};
+        const bool contains =
+          std::ranges::any_of(keywords, [&identifier](const string& keyword) { return keyword == identifier; });
+
+        return contains;
     }
 }  // namespace mathc

@@ -16,9 +16,13 @@ namespace mathc {
             advance();
         }
 
+        vector<unique_ptr<ast_node>> parse_program();
         unique_ptr<ast_node> parse_expression();
         unique_ptr<ast_node> parse_term();
         unique_ptr<ast_node> parse_factor();
+        unique_ptr<ast_node> parse_additive();
+        unique_ptr<ast_node> parse_assignment();
+        unique_ptr<ast_node> parse_print_statement();
 
     private:
         token_scanner& scanner_;

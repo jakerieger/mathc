@@ -19,6 +19,7 @@ namespace mathc {
         TOKEN_NUMBER,       // '134.34'
         TOKEN_IDENTIFIER,   // 'x', 'my_num'
         TOKEN_ASSIGNMENT,   // '='
+        TOKEN_KEYWORD,      // 'print', 'if', 'fn'
         TOKEN_INVALID,
         TOKEN_EOF,
     };
@@ -45,6 +46,9 @@ namespace mathc {
                 stream << " (" << std::get<f64>(tok.value) << ")";
             }
             if (tok.type == token_type::TOKEN_IDENTIFIER) {
+                stream << " ('" << std::get<string>(tok.value) << "')";
+            }
+            if (tok.type == token_type::TOKEN_KEYWORD) {
                 stream << " ('" << std::get<string>(tok.value) << "')";
             }
             stream << "\n";
@@ -79,9 +83,10 @@ namespace mathc {
                     return "Identifier";
                 case token_type::TOKEN_ASSIGNMENT:
                     return "Assignment `=`";
+                case token_type::TOKEN_KEYWORD:
+                    return "Keyword";
                 case token_type::TOKEN_EOF:
                     return "EOF";
-                    break;
             }
 
             return "";
@@ -111,5 +116,6 @@ namespace mathc {
         token parse_identifier();
         void skip_comment();
         static bool is_whitespace(char c);
+        static bool is_keyword(const string& identifier);
     };
 }  // namespace mathc
