@@ -35,13 +35,12 @@ static i32 read_source_file(const char* filename, string& output) {
     return 0;
 }
 
-static i32 get_ast(const string& input, unique_ptr<ast_node>& ast_out) {
+static i32 get_program(const string& input, mathc_program& program_out) {
     token_scanner scanner(input);
     expr_parser parser(scanner);
 
     try {
-        unique_ptr<ast_node> ast = parser.parse_expression();
-        ast_out                  = std::move(ast);
+        program_out = parser.parse_program();
         return 0;
     } catch (const parse_error& e) {
         std::cerr << "error: " << e.what() << "\n";
@@ -49,11 +48,11 @@ static i32 get_ast(const string& input, unique_ptr<ast_node>& ast_out) {
     }
 }
 
-static i32 generate_assembly(ast_node* ast, string& asm_out) {
+static i32 generate_assembly(const mathc_program& program, string& asm_out) {
     code_generator codegen;
 
     try {
-        codegen.generate(ast);
+        codegen.generate_program(program);
         asm_out = codegen.get_asm();
         return 0;
     } catch (const codegen_error& e) {
@@ -77,23 +76,48 @@ static i32 write_asm_to_disk(const string& assembly, const path& output_path) {
 }
 
 static i32 compile(const char* filename) {
+    std::cout << "[compiling] " << filename << "\n";
+
     const auto start = std::chrono::high_resolution_clock::now();
 
     string input;
     i32 result = read_source_file(filename, input);
     CHECK_RESULT(result)
 
-    // TODO: Compile program to final ASM
-    // TODO: Pass final ASM to NASM/GCC for assembly/linking
-    // TODO: Return final exe path
+    mathc_program program;
+    result = get_program(input, program);
+    CHECK_RESULT(result)
+
+    string assembly;
+    result = generate_assembly(program, assembly);
+    CHECK_RESULT(result);
+
+    // Create output directory
+    const string filename_no_ext = path(filename).stem().string();
+    const path source_root       = path(filename).parent_path();
+    const path output_path       = source_root / "out";
+    if (!exists(output_path)) {
+        fs::create_directory(output_path);
+    }
+    const path assembly_path = output_path / (filename_no_ext + ".s");
+
+    result = write_asm_to_disk(assembly, assembly_path);
+    CHECK_RESULT(result);
+
+    const path obj_path = output_path / (filename_no_ext + ".o");
+
+    result = assembler::run_nasm(assembly_path, obj_path);
+    CHECK_RESULT(result);
+
+    const path exe_path = output_path / (filename_no_ext);
+
+    result = assembler::run_linker(obj_path, exe_path);
+    CHECK_RESULT(result);
 
     const auto end     = std::chrono::high_resolution_clock::now();
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-    assembler::run_nasm("", "");
-    assembler::run_linker("", "");
-
-    //    std::cout << "Compilation completed (took: " << elapsed << ")\n  => " << ld_output_path.string() << "\n";
+    std::cout << "Compilation completed (took: " << elapsed << ")\n  => " << fs::absolute(exe_path).string() << "\n";
 
     return result;
 }

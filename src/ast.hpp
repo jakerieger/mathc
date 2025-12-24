@@ -90,4 +90,6 @@ namespace mathc {
             right->print(indent + 4);
         }
     };
+
+    using mathc_program = vector<unique_ptr<ast_node>>;
 }  // namespace mathc
